@@ -1,0 +1,16 @@
+services:
+  database_server:
+    image: postgres:15-alpine
+    container_name: habit_tracker_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: habit_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_repository_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_repository_data:
