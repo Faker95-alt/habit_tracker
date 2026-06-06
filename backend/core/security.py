@@ -3,10 +3,9 @@ from datetime import datetime, timedelta
 from typing import Optional
 from jose import JWTError, jwt
 
-# Ключ для шифрования токенов (в продакшене должен браться из переменных окружения)
 SECRET_KEY = os.getenv("SECRET_KEY", "SUPER_SECRET_KEY_FOR_HABIT_TRACKER_DEVELOMPENT_2026")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # Токен будет жить 7 дней, чтобы боту не пришлось часто переавторизовываться
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
@@ -20,11 +19,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
         expire_time = datetime.utcnow() + expires_delta
     else:
         expire_time = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-
-    # Добавляем время истечения токена в payload
     data_to_encode.update({"exp": expire_time})
-
-    # Кодируем JWT-токен
     jwt_token = jwt.encode(data_to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return jwt_token
 

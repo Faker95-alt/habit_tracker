@@ -8,15 +8,12 @@ from bot.services import (
     send_habit_execution_log, delete_selected_habit
 )
 
-# Инициализация бота
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8949113905:AAFiQZNRZp4YxFe-b4ATqCIkr_98iTIK204")
 bot = telebot.TeleBot(TELEGRAM_BOT_TOKEN)
 
 
 def get_main_reply_keyboard() -> ReplyKeyboardMarkup:
     """Генерирует красивое постоянное нижнее меню (Reply Keyboard)."""
-    # resize_keyboard=True делает кнопки компактными под размер экрана
-    # persistent=True оставляет клавиатуру видимой, даже когда открыта обычная клавиатура
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
     button_list = KeyboardButton("📋 Мои привычки")
@@ -31,8 +28,6 @@ def handle_start_or_menu_command(message):
     """Регистрирует пользователя и выводит постоянное нижнее меню."""
     telegram_id = message.from_user.id
     bot.send_message(message.chat.id, "⚡ Инициализация профиля...")
-
-    # Фоновая авторизация
     register_user_in_backend(telegram_id)
     access_token = authorize_user_and_get_token(telegram_id)
 
@@ -49,8 +44,6 @@ def handle_start_or_menu_command(message):
     bot.send_message(message.chat.id, welcome_text, reply_markup=get_main_reply_keyboard(), parse_mode="Markdown")
 
 
-# --- ОБРАБОТЧИК НАЖАТИЙ НА НИЖНЕЕ МЕНЮ (ТЕКСТОВЫЕ КНОПКИ) ---
-
 @bot.message_handler(func=lambda message: message.text in ["📋 Мои привычки", "➕ Добавить привычку"])
 def handle_reply_menu_clicks(message):
     """Обрабатывает клики по текстовым кнопкам нижнего меню."""
@@ -60,7 +53,6 @@ def handle_reply_menu_clicks(message):
         show_today_habits(message.chat.id, telegram_id)
 
     elif message.text == "➕ Добавить привычку":
-        # Используем ReplyKeyboardRemove, чтобы временно спрятать нижнее меню, пока пользователь пишет текст
         sent_message = bot.send_message(
             message.chat.id,
             "✍️ Введи *название* новой привычки (например: 'Зарядка'):",
@@ -102,8 +94,6 @@ def show_today_habits(chat_id: int, telegram_id: int):
             f"📈 Прогресс: *{completed_count} из 21 дня*\n"
             f"⚡ Статус сегодня: {today_status}"
         )
-
-        # Inline-кнопки под конкретной привычкой
         keyboard = InlineKeyboardMarkup()
         button_complete = InlineKeyboardButton("✅ Выполнил", callback_data=f"complete_{habit['id']}")
         button_fail = InlineKeyboardButton("❌ Пропустил", callback_data=f"fail_{habit['id']}")
@@ -114,8 +104,6 @@ def show_today_habits(chat_id: int, telegram_id: int):
 
         bot.send_message(chat_id, card_text, reply_markup=keyboard, parse_mode="Markdown")
 
-
-# --- ОБРАБОТКА ИНЛАЙН КНОПОК ПОД КАРТОЧКАМИ ---
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_inline_callbacks(call):
@@ -142,8 +130,6 @@ def handle_inline_callbacks(call):
             bot.delete_message(chat_id, call.message.message_id)
 
 
-# --- СЦЕНАРИЙ СОЗДАНИЯ ПРИВЫЧКИ ---
-
 def process_title_step(message):
     habit_title = message.text.strip() if message.text else ""
     if not habit_title:
@@ -161,7 +147,6 @@ def process_description_step(message, habit_title):
 
     created = create_new_habit(telegram_id, title=habit_title, description=habit_description)
     if created:
-        # Возвращаем постоянную нижнюю клавиатуру после завершения ввода
         bot.send_message(
             message.chat.id,
             f"🎉 Привычка *{habit_title}* успешно создана!",

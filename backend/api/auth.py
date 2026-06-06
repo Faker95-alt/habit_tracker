@@ -23,14 +23,13 @@ def register_telegram_user(user_data: UserCreateSchema, database_session: Sessio
 
 @auth_router.post("/login", response_model=TokenSchema)
 def login_for_access_token(
-    form_data: OAuth2PasswordRequestForm = Depends(),
-    database_session: Session = Depends(get_database_session)
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        database_session: Session = Depends(get_database_session)
 ):
     """
     Принимает Telegram ID (в поле username) и пароль.
     Возвращает JWT-токен для последующего доступа к CRUD-методам привычек.
     """
-    # Поле username из стандартной формы OAuth2 используется под наш Telegram ID
     try:
         telegram_id = int(form_data.username)
     except ValueError:
@@ -46,7 +45,5 @@ def login_for_access_token(
             detail="Неверный Telegram ID или пароль.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-    # Зашиваем Telegram ID в поле 'sub' токена
     access_token = create_access_token(data={"sub": str(user.telegram_id)})
     return {"access_token": access_token, "token_type": "bearer"}

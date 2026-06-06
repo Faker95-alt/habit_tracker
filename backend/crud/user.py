@@ -3,7 +3,6 @@ from backend.db.models import UserModel
 from backend.schemas.schemas import UserCreateSchema
 from passlib.context import CryptContext
 
-# Настройка контекста для безопасного хеширования паролей (алгоритм bcrypt)
 password_context = CryptContext(schemes=["sha256_crypt"], deprecated="auto")
 
 

@@ -25,7 +25,6 @@ def get_active_habits_for_today(database_session: Session, user_id: int, target_
     Возвращает список активных привычек пользователя на текущий день.
     Реализует механизм переноса: привычка переносится, если она выполнена менее 21 раза.
     """
-    # Подзапрос: считаем количество успешных выполнений для каждой привычки
     completed_logs_count_subquery = (
         database_session.query(
             HabitLogModel.habit_id,
@@ -35,9 +34,6 @@ def get_active_habits_for_today(database_session: Session, user_id: int, target_
         .group_by(HabitLogModel.habit_id)
         .subquery()
     )
-
-    # Основной запрос: выбираем активные привычки, у которых успешных логов меньше target_days_count (21)
-    # Используем outerjoin, чтобы учесть привычки, у которых еще вообще нет логов (total_completed IS NULL)
     query = (
         database_session.query(HabitModel)
         .outerjoin(completed_logs_count_subquery, HabitModel.id == completed_logs_count_subquery.c.habit_id)
@@ -56,8 +52,6 @@ def update_user_habit(database_session: Session, habit_id: int, habit_data: Habi
     habit = database_session.query(HabitModel).filter(HabitModel.id == habit_id).first()
     if not habit:
         return None
-
-    # Динамически обновляем только те поля, которые были переданы
     if habit_data.title is not None:
         habit.title = habit_data.title
     if habit_data.description is not None:
@@ -87,8 +81,6 @@ def log_habit_execution(database_session: Session, habit_id: int, is_completed: 
     """
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
     today_end = datetime.utcnow().replace(hour=23, minute=59, second=59, microsecond=999999)
-
-    # Проверяем, была ли уже отметка на сегодня
     existing_log = (
         database_session.query(HabitLogModel)
         .filter(

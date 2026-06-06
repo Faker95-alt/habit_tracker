@@ -6,7 +6,6 @@ from backend.core.security import decode_access_token
 from backend.crud.user import get_user_by_telegram_id
 from backend.db.models import UserModel
 
-# Указываем схему авторизации. Бот будет слать токен в заголовке Authorization: Bearer <токен>
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 
 

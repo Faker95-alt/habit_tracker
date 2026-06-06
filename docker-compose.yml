@@ -12,7 +12,7 @@ services:
     volumes:
       - postgres_repository_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -40,7 +40,7 @@ services:
     restart: always
     environment:
       - BACKEND_URL=http://backend:8000/api
-      - TELEGRAM_BOT_TOKEN=8949113905:AAFiQZNRZp4YxFe-b4ATqCIkr_98iTIK204  # <--- ВСТАВЬ СЮДА СВОЙ ТОКЕН ОТ @BotFather
+      - TELEGRAM_BOT_TOKEN=8949113905:AAFiQZNRZp4YxFe-b4ATqCIkr_98iTIK204
     depends_on:
       - backend
       - database_server
