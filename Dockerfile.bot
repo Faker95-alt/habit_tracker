@@ -1,0 +1,26 @@
+FROM python:3.11-slim
+
+# Устанавливаем рабочую директорию
+WORKDIR /app
+
+# Отключаем буферизацию логов и генерацию .pyc файлов
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
+
+# Копируем файлы зависимостей
+COPY pyproject.toml poetry.lock /app/
+
+# Устанавливаем Poetry
+RUN pip install --no-cache-dir poetry
+
+# Настраиваем Poetry ставить пакеты глобально в контейнер (БЕЗ privileges.local)
+RUN poetry config virtualenvs.create false
+
+# Устанавливаем зависимости проекта
+RUN poetry install --no-interaction --no-ansi --no-root
+
+# Копируем исходный код бота
+COPY ./bot /app/bot
+
+# Команда запуска
+CMD ["sh", "-c", "PYTHONPATH=. python bot/main.py"]

@@ -11,6 +11,39 @@ services:
       - "5432:5432"
     volumes:
       - postgres_repository_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: habit_tracker_backend
+    restart: always
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@database_server:5432/habit_db
+      - SECRET_KEY=SUPER_SECRET_KEY_FOR_HABIT_TRACKER_DEVELOMPENT_2026
+    ports:
+      - "8000:8000"
+    depends_on:
+      database_server:
+        condition: service_healthy
+
+  bot:
+    build:
+      context: .
+      dockerfile: Dockerfile.bot
+    container_name: habit_tracker_bot
+    restart: always
+    environment:
+      - BACKEND_URL=http://backend:8000/api
+      - TELEGRAM_BOT_TOKEN=8949113905:AAFiQZNRZp4YxFe-b4ATqCIkr_98iTIK204  # <--- ВСТАВЬ СЮДА СВОЙ ТОКЕН ОТ @BotFather
+    depends_on:
+      - backend
+      - database_server
 
 volumes:
   postgres_repository_data:
