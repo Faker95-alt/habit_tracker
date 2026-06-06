@@ -11,8 +11,6 @@ class UserModel(Base):
     telegram_id = Column(BigInteger, unique=True, nullable=False, index=True)
     hashed_password = Column(String, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-
-    # Связь с привычками: один пользователь может иметь много привычек
     habits = relationship("HabitModel", back_populates="user", cascade="all, delete-orphan")
 
 
@@ -25,8 +23,6 @@ class HabitModel(Base):
     description = Column(String, nullable=True)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
-
-    # Обратные связи
     user = relationship("UserModel", back_populates="habits")
     logs = relationship("HabitLogModel", back_populates="habit", cascade="all, delete-orphan")
 
@@ -38,6 +34,4 @@ class HabitLogModel(Base):
     habit_id = Column(Integer, ForeignKey("habits.id", ondelete="CASCADE"), nullable=False)
     log_date = Column(DateTime, default=datetime.utcnow, nullable=False)
     is_completed = Column(Boolean, default=False, nullable=False)
-
-    # Связь с привычкой
     habit = relationship("HabitModel", back_populates="logs")

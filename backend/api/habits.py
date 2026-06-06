@@ -60,7 +60,6 @@ def delete_habit(
         current_user: UserModel = Depends(get_current_authenticated_user)
 ):
     """Полностью удаляет привычку."""
-    # Сначала проверяем принадлежность привычки пользователю
     from backend.db.models import HabitModel
     habit = database_session.query(HabitModel).filter(HabitModel.id == habit_id).first()
     if not habit or habit.user_id != current_user.id:

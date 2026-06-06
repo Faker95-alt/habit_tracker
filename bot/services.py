@@ -2,11 +2,7 @@ import os
 import requests
 from typing import Optional, List
 
-# URL бэкенда внутри сети Docker или локально
 BACKEND_URL = os.getenv("BACKEND_URL", "http://localhost:8000/api")
-
-# Локальное "in-memory" хранилище JWT-токенов пользователей для MVP.
-# Ключ — telegram_id, значение — строковый access_token.
 USER_TOKENS_STORAGE = {}
 
 
@@ -27,7 +23,6 @@ def register_user_in_backend(telegram_id: int) -> bool:
 def authorize_user_and_get_token(telegram_id: int) -> Optional[str]:
     """Авторизует бота на бэкенде и сохраняет полученный JWT-токен."""
     url = f"{BACKEND_URL}/auth/login"
-    # Стандартная форма OAuth2 ожидает данные в формате x-www-form-urlencoded
     form_data = {
         "username": str(telegram_id),
         "password": f"password_{telegram_id}"
@@ -48,7 +43,6 @@ def get_headers_with_authorization(telegram_id: int) -> dict:
     """Формирует заголовки запроса с JWT-токеном авторизации."""
     token = USER_TOKENS_STORAGE.get(telegram_id)
     if not token:
-        # Если токена нет в памяти, пытаемся авторизоваться заново
         token = authorize_user_and_get_token(telegram_id)
     return {"Authorization": f"Bearer {token}"} if token else {}
 

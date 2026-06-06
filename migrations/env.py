@@ -2,19 +2,12 @@ import os
 from logging.config import fileConfig
 from sqlalchemy import engine_from_config, pool
 from alembic import context
-
-# Импортируем Базовый класс и модели, чтобы Alembic их увидел
 from backend.db.base import Base
 from backend.db.models import UserModel, HabitModel, HabitLogModel
 
-# Объект конфигурации Alembic (читает alembic.ini)
 config = context.config
-
-# Настройка логирования (берется из alembic.ini)
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-# Связываем метаданные наших моделей с Alembic для поддержки автогенерации
 target_metadata = Base.metadata
 
 
@@ -34,11 +27,9 @@ def run_migrations_offline() -> None:
 
 def run_migrations_online() -> None:
     """Запуск миграций в 'онлайн' режиме (с подключением к реальной БД)."""
-    # Сначала пытаемся взять URL из переменной окружения (понадобится для Docker)
     database_url = os.getenv("DATABASE_URL")
 
     if database_url:
-        # Если переменная есть, динамически меняем URL в конфиге Alembic
         config.set_main_option("sqlalchemy.url", database_url)
 
     connectable = engine_from_config(

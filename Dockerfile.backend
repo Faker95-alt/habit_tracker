@@ -1,34 +1,16 @@
 FROM python:3.11-slim
-
-# Устанавливаем рабочую директорию в контейнере
 WORKDIR /app
-
-# Запрещаем Python писать файлы .pyc на диск и буферизировать потоки stdout/stderr
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-# Устанавливаем системные зависимости для сборки бинарных пакетов (например, psycopg2)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
-
-# Копируем конфигурацию Poetry
 COPY pyproject.toml poetry.lock /app/
-
-# Устанавливаем саму утилиту Poetry
 RUN pip install --no-cache-dir poetry
-
-# Настраиваем Poetry так, чтобы он не создавал виртуальное окружение внутри контейнера
 RUN poetry config virtualenvs.create false
-
-# Устанавливаем все зависимости проекта
 RUN poetry install --no-interaction --no-ansi --no-root
-
-# Копируем исходный код бэкенда и конфигурацию миграций
 COPY ./backend /app/backend
 COPY ./migrations /app/migrations
 COPY ./alembic.ini /app/alembic.ini
-
-# Команда для автоматического применения миграций и запуска FastAPI
 CMD ["sh", "-c", "PYTHONPATH=. poetry run alembic upgrade head && uvicorn backend.main:app --host 0.0.0.0 --port 8000"]

@@ -3,10 +3,6 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
-# ==========================================
-# СХЕМЫ ДЛЯ ПОЛЬЗОВАТЕЛЕЙ (User)
-# ==========================================
-
 class UserCreateSchema(BaseModel):
     """Схема для регистрации нового пользователя через Telegram ID."""
     telegram_id: int = Field(..., description="Уникальный идентификатор пользователя в Telegram")
@@ -20,13 +16,8 @@ class UserResponseSchema(BaseModel):
     created_at: datetime
 
     class Config:
-        # Включаем режим поддержки ORM (SQLAlchemy моделей)
         from_attributes = True
 
-
-# ==========================================
-# СХЕМЫ ДЛЯ ЛОГОВ ВЫПОЛНЕНИЯ (HabitLog)
-# ==========================================
 
 class HabitLogCreateSchema(BaseModel):
     """Схема для фиксации выполнения привычки (выполнил / не выполнил)."""
@@ -43,10 +34,6 @@ class HabitLogResponseSchema(BaseModel):
     class Config:
         from_attributes = True
 
-
-# ==========================================
-# СХЕМЫ ДЛЯ ПРИВЫЧЕК (Habit)
-# ==========================================
 
 class HabitCreateSchema(BaseModel):
     """Схема для создания новой ежедневной привычки."""
@@ -69,16 +56,11 @@ class HabitResponseSchema(BaseModel):
     description: Optional[str]
     is_active: bool
     created_at: datetime
-    # Сюда автоматически подтянется список логов, если мы запросим его из БД
     logs: List[HabitLogResponseSchema] = []
 
     class Config:
         from_attributes = True
 
-
-# ==========================================
-# СХЕМЫ ДЛЯ АУТЕНТИФИКАЦИИ (Токены)
-# ==========================================
 
 class TokenSchema(BaseModel):
     """Схема токена доступа, который выдается боту."""

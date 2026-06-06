@@ -3,7 +3,7 @@ name = "habit-tracker"
 version = "0.1.0"
 description = "Чат-бот для трекинга привычек"
 authors = [
-    {name = "Vasiliy Plotnikov"}
+    { name = "Vasiliy Plotnikov" }
 ]
 requires-python = ">=3.11"
 dependencies = [
